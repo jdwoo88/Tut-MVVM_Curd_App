@@ -2,6 +2,7 @@ package com.jwoo.mvvmcurd
 
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +28,11 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 
     @Bindable
     val clearButton = MutableLiveData<String>()
+
+    private val statusMessage = MutableLiveData<Event<String>>()
+
+    val message : LiveData<Event<String>>
+        get() = statusMessage
 
     init {
         saveButton.value = "Save"
@@ -62,7 +68,10 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
     }
 
     fun insert(subscriber: Subscriber): Job =
-        viewModelScope.launch { repository.insert(subscriber) }
+        viewModelScope.launch {
+            repository.insert(subscriber)
+            statusMessage.value = Event("Subscriber has been inserted successfully")
+        }
 
     fun update(subscriber: Subscriber): Job =
         viewModelScope.launch {
@@ -73,6 +82,8 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
             isUpdateOrDelete = false;
             saveButton.value = "Save"
             clearButton.value = "Clear Db"
+
+            statusMessage.value = Event("Subscriber has been updated successfully")
         }
 
     fun delete(subscriber: Subscriber): Job =
@@ -84,9 +95,15 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
             isUpdateOrDelete = false;
             saveButton.value = "Save"
             clearButton.value = "Clear Db"
+
+            statusMessage.value = Event("Subscriber has been deleted successfully")
         }
 
-    fun deleteAll(): Job = viewModelScope.launch { repository.deleteAll() }
+    fun deleteAll(): Job = viewModelScope.launch {
+        repository.deleteAll()
+
+        statusMessage.value = Event("All Subscribers has been deleted successfully")
+    }
 
     fun initUpdateAndDelete(subscriber : Subscriber){
         inputName.value = subscriber.name

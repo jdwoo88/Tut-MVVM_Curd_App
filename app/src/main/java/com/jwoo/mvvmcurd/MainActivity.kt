@@ -1,8 +1,9 @@
 package com.jwoo.mvvmcurd
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +18,7 @@ import com.jwoo.mvvmcurd.dbs.SubscriberRepository
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var subscriberViewModel : SubscriberViewModel
+    private lateinit var subscriberViewModel: SubscriberViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,22 +32,30 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         initRecyclerView()
+
+        subscriberViewModel.message.observe(this, Observer {
+            it.getContentIfNotHandled()?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
-    private fun initRecyclerView(){
+    private fun initRecyclerView() {
         binding.recyclerViewSubscriber.layoutManager = LinearLayoutManager(this)
         displaySubscribersList()
     }
 
-    private fun displaySubscribersList(){
+    private fun displaySubscribersList() {
         subscriberViewModel.subscribers.observe(this, Observer {
             Log.d("MYTAG", it.toString())
-            binding.recyclerViewSubscriber.adapter = SubscriberRecyclerViewAdapter(it, { selectedItem : Subscriber -> listItemClicked(selectedItem) } )
+            binding.recyclerViewSubscriber.adapter = SubscriberRecyclerViewAdapter(
+                it,
+                { selectedItem: Subscriber -> listItemClicked(selectedItem) })
         })
     }
 
-    private fun listItemClicked(subscriber : Subscriber){
-        Log.d("MYTAG", subscriber.email)
+    private fun listItemClicked(subscriber: Subscriber) {
+        Log.d("MYTAG", "Currently selected subscriber's email: " + subscriber.email)
         subscriberViewModel.initUpdateAndDelete(subscriber)
     }
 }

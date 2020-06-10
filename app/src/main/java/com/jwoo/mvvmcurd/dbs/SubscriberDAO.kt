@@ -7,20 +7,20 @@ import androidx.room.*
 interface SubscriberDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSubscriber(subscriber : Subscriber) : Long
+    suspend fun insertSubscriber(subscriber: Subscriber): Long
 
     // @Insert
     // suspend fun insertSubscribers(subscribers : List<Subscriber>) : List<Long>
 
     @Update
-    suspend fun updateSubscriber(subscriber : Subscriber)
+    suspend fun updateSubscriber(subscriber: Subscriber)
 
     @Delete
-    suspend fun deleteSubscriber(subscriber : Subscriber)
+    suspend fun deleteSubscriber(subscriber: Subscriber)
 
     @Query("DELETE FROM subscriber_data_table")
     suspend fun deleteAll()
 
     @Query("SELECT * FROM subscriber_data_table")
-    fun getAllSubscribers() : LiveData<List<Subscriber>>
+    fun getAllSubscribers(): LiveData<List<Subscriber>>
 }

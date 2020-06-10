@@ -44,16 +44,15 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 
         if (inputName.value == null) {
             statusMessage.value = Event("Subscriber's name cannot be empty.")
-            return;
-        }
-        else if (inputEmail.value == null) {
+            return
+        } else if (inputEmail.value == null) {
             statusMessage.value = Event("Subscriber's email address cannot be empty.")
-            return;
+            return
         }
 
-        if (!Patterns.EMAIL_ADDRESS.matcher(inputEmail.value!!).matches()){
+        if (!Patterns.EMAIL_ADDRESS.matcher(inputEmail.value!!).matches()) {
             statusMessage.value = Event("Please enter correct email address format.")
-            return;
+            return
         }
 
         if (isUpdateOrDelete) {

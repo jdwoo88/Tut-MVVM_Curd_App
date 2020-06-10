@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jwoo.mvvmcurd.databinding.ActivityMainBinding
+import com.jwoo.mvvmcurd.dbs.Subscriber
 import com.jwoo.mvvmcurd.dbs.SubscriberDatabase
 import com.jwoo.mvvmcurd.dbs.SubscriberRepository
 
@@ -39,8 +40,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun displaySubscribersList(){
         subscriberViewModel.subscribers.observe(this, Observer {
-            Log.i("MYTAG", it.toString())
-            binding.recyclerViewSubscriber.adapter = SubscriberRecyclerViewAdapter(it)
+            Log.d("MYTAG", it.toString())
+            binding.recyclerViewSubscriber.adapter = SubscriberRecyclerViewAdapter(it, { selectedItem : Subscriber -> listItemClicked(selectedItem) } )
         })
+    }
+
+    private fun listItemClicked(subscriber : Subscriber){
+        Log.d("MYTAG", subscriber.email)
+        subscriberViewModel.initUpdateAndDelete(subscriber)
     }
 }

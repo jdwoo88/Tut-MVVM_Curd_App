@@ -7,7 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jwoo.mvvmcurd.databinding.ListItemBinding
 import com.jwoo.mvvmcurd.dbs.Subscriber
 
-class SubscriberRecyclerViewAdapter (private val subscribersList : List<Subscriber>) : RecyclerView.Adapter<SubscriberViewHolder>() {
+class SubscriberRecyclerViewAdapter (private val subscribersList : List<Subscriber>,
+                                    private val clickListener: (Subscriber)-> Unit ) : RecyclerView.Adapter<SubscriberViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubscriberViewHolder {
         val layoutInflater : LayoutInflater = LayoutInflater.from(parent.context)
         val binding : ListItemBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item, parent, false)
@@ -19,13 +20,16 @@ class SubscriberRecyclerViewAdapter (private val subscribersList : List<Subscrib
     }
 
     override fun onBindViewHolder(holder: SubscriberViewHolder, position: Int) {
-        holder.bind(subscribersList[position])
+        holder.bind(subscribersList[position], clickListener)
     }
 }
 
 class SubscriberViewHolder(val binding : ListItemBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(subscriber : Subscriber){
+    fun bind(subscriber : Subscriber, clickListener: (Subscriber)-> Unit){
         binding.txtName.text = subscriber.name
         binding.txtEmail.text = subscriber.email
+        binding.listItemLayout.setOnClickListener {
+            clickListener(subscriber)
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.jwoo.mvvmcurd
 
+import android.util.Patterns
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.lifecycle.LiveData
@@ -14,8 +15,8 @@ import kotlinx.coroutines.launch
 class SubscriberViewModel(private val repository: SubscriberRepository) : ViewModel(), Observable {
 
     val subscribers = repository.subscribers
-    private var isUpdateOrDelete : Boolean = false
-    private lateinit var subscriberToDelete : Subscriber
+    private var isUpdateOrDelete: Boolean = false
+    private lateinit var subscriberToDelete: Subscriber
 
     @Bindable
     val inputName = MutableLiveData<String>()
@@ -31,7 +32,7 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 
     private val statusMessage = MutableLiveData<Event<String>>()
 
-    val message : LiveData<Event<String>>
+    val message: LiveData<Event<String>>
         get() = statusMessage
 
     init {
@@ -41,15 +42,27 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 
     fun Save() {
 
+        if (inputName.value == null) {
+            statusMessage.value = Event("Subscriber's name cannot be empty.")
+            return;
+        }
+        else if (inputEmail.value == null) {
+            statusMessage.value = Event("Subscriber's email address cannot be empty.")
+            return;
+        }
 
-        if (isUpdateOrDelete){
+        if (!Patterns.EMAIL_ADDRESS.matcher(inputEmail.value!!).matches()){
+            statusMessage.value = Event("Please enter correct email address format.")
+            return;
+        }
+
+        if (isUpdateOrDelete) {
             subscriberToDelete.name = inputName.value!!
             subscriberToDelete.email = inputEmail.value!!
             update(subscriberToDelete)
-        }
-        else{
+        } else {
             val name: String = inputName.value!!
-            val email:String = inputEmail.value!!
+            val email: String = inputEmail.value!!
 
             insert(Subscriber(0, name, email))
 
@@ -59,21 +72,19 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
     }
 
     fun Clear() {
-        if (isUpdateOrDelete){
+        if (isUpdateOrDelete) {
             delete(subscriberToDelete)
-        }
-        else {
+        } else {
             deleteAll()
         }
     }
 
     fun insert(subscriber: Subscriber): Job =
         viewModelScope.launch {
-            var id : Long = repository.insert(subscriber)
+            var id: Long = repository.insert(subscriber)
             if (id > -1) {
                 statusMessage.value = Event("Subscriber has been inserted successfully - $id")
-            }
-            else {
+            } else {
                 statusMessage.value = Event("Failed to insert the subscriber.")
             }
         }
@@ -84,7 +95,7 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 
             inputName.value = null
             inputEmail.value = null
-            isUpdateOrDelete = false;
+            isUpdateOrDelete = false
             saveButton.value = "Save"
             clearButton.value = "Clear Db"
 
@@ -97,7 +108,7 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
 
             inputName.value = null
             inputEmail.value = null
-            isUpdateOrDelete = false;
+            isUpdateOrDelete = false
             saveButton.value = "Save"
             clearButton.value = "Clear Db"
 
@@ -110,10 +121,10 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
         statusMessage.value = Event("All Subscribers has been deleted successfully")
     }
 
-    fun initUpdateAndDelete(subscriber : Subscriber){
+    fun initUpdateAndDelete(subscriber: Subscriber) {
         inputName.value = subscriber.name
         inputEmail.value = subscriber.email
-        isUpdateOrDelete = true;
+        isUpdateOrDelete = true
         subscriberToDelete = subscriber
         saveButton.value = "Update"
         clearButton.value = "Delete"
